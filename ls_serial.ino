@@ -297,6 +297,8 @@ void serialRestoreSettings() {
 
   // activate the retrieved settings
   if (settingsApplied) {
+    // The validated configuration may replace per-split Strum settings.
+    resetConfiguredDynamicStrumRuntime(getConfiguredDynamicStrumSplit());
     applyConfiguration();
   }
 

@@ -1064,6 +1064,11 @@ boolean handleXYZupdate() {
         if (isSwitchLegatoPressed(sensorSplit) && !hasOtherTouchInSplit(sensorSplit)) {
           noteTouchMapping[sensorSplit].releaseLatched();
         }
+
+        // Queue the MIDI event before refreshing the Scalar visual overlay.
+        if (Device.scalarLayoutEnabled && displayMode == displayNormal) {
+          refreshScalarLayoutPlayedLeds();
+        }
       }
 
       // if sensing Z is enabled...
@@ -1244,13 +1249,8 @@ void prepareNewNote(signed char notenum) {
   // register the reverse mapping
   noteTouchMapping[sensorSplit].noteOn(notenum, channel, sensorCol, sensorRow);
 
-  // Scalar Layout always uses its own red physical-touch and active-pitch
-  // overlay, independent of the stock per-split played-color preference.
-  if (Device.scalarLayoutEnabled && displayMode == displayNormal) {
-    refreshScalarLayoutPlayedLeds();
-  }
   // highlight the touch animation if this is activated
-  else if (Split[sensorSplit].colorPlayed) {
+  if (Split[sensorSplit].colorPlayed) {
     if (Split[sensorSplit].playedTouchMode == playedCell) {
       setLed(sensorCol, sensorRow, Split[sensorSplit].colorPlayed, cellOn, LED_LAYER_PLAYED);
     }

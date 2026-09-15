@@ -75,6 +75,16 @@ void refreshDynamicTouchState() {
   }
 }
 void resetDynamicRuntime() { releaseAllSoundingDynamicNotes(); clearDynamicPitchMaps(); dynamicVoicingTouchCount=0; dynamicStrumTouchCount=0; dynamicNotesRetainedByLegato=false; }
+void clearDynamicTouchCells(byte dynamicSplit);
+
+// Clear all runtime state owned by the currently configured Dynamic Strum
+// before another feature overwrites its mode or settings. The caller remains
+// responsible for changing Split[].strum and refreshing the display.
+void resetConfiguredDynamicStrumRuntime(byte dynamicSplit) {
+  if (dynamicSplit == 255) return;
+  resetDynamicRuntime();
+  clearDynamicTouchCells(dynamicSplit);
+}
 
 void clearDynamicTouchCells(byte dynamicSplit) {
   if (dynamicSplit == 255) return;
@@ -174,7 +184,6 @@ void dynamicStrumCaptureVoicing(byte split) {
 }
 
 void dynamicStrumTrigger(byte split, boolean retrigger) {
-  rebuildDynamicLiveMap();
   refreshDynamicTouchState();
   if (!dynamicStrumSnapshotValid || sensorRow >= MAXROWS) return;
   short pitch = dynamicStrumSnapshot[sensorRow];
@@ -211,15 +220,14 @@ void setDynamicStrumMode(byte split, byte mode) {
   if (mode > STRUM_DYNAMIC) mode = STRUM_OFF;
   // Only Dynamic mode changes may clear Dynamic-owned touch state.
   byte oldDynamicSplit = getConfiguredDynamicStrumSplit();
-  resetDynamicRuntime();
-  if (oldDynamicSplit != 255) {
-    clearDynamicTouchCells(oldDynamicSplit);
+  if (oldDynamicSplit != 255 &&
+      (oldDynamicSplit != split || mode != STRUM_DYNAMIC)) {
+    resetConfiguredDynamicStrumRuntime(oldDynamicSplit);
   }
   Split[split].strum = mode;
   if (mode == STRUM_DYNAMIC) {
     byte other = otherSplit(split);
     if (Split[other].strum == STRUM_DYNAMIC) Split[other].strum = STRUM_OFF;
-    Split[other].strum = false;
     Split[split].arpeggiator = false;
     Split[split].ccFaders = false;
     setSplitSequencerEnabled(split, false);

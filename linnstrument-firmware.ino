@@ -1120,6 +1120,9 @@ inline unsigned short calculatePreferredPressureRange(unsigned short sensorRange
 /********************************************** SETUP ********************************************/
 
 void reset() {
+  if (setupDone) {
+    resetConfiguredDynamicStrumRuntime(getConfiguredDynamicStrumSplit());
+  }
   lastReset = millis();
 
   Global.currentPerSplit = LEFT;

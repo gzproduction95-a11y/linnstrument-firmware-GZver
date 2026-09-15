@@ -120,9 +120,14 @@ void refreshScalarLayoutPlayedLeds() {
   boolean activeMidiNotes[128];
   memset(activeMidiNotes, 0, sizeof(activeMidiNotes));
 
-  // First collect the active notes without changing the visible LED state.
+  // First collect active notes from the maintained touch bitmasks. The touch
+  // and note checks remain deliberately unchanged for pending-release cells.
   for (byte row = 0; row < NUMROWS; ++row) {
-    for (byte col = 1; col < NUMCOLS; ++col) {
+    int32_t touchedColumns = colsInRowsTouched[row];
+    while (touchedColumns) {
+      byte col = __builtin_ctz((uint32_t)touchedColumns);
+      touchedColumns &= touchedColumns - 1;
+      if (col == 0 || col >= NUMCOLS) continue;
       TouchInfo& touch = cell(col, row);
       if (touch.touched == touchedCell && touch.hasNote()) {
         activeMidiNotes[(byte)touch.note] = true;
@@ -201,7 +206,10 @@ boolean findScalarLayoutTransferSource(byte* sourceCol, byte* sourceRow) {
   unsigned short bestScore = 0xffff;
 
   for (byte candidateRow = 0; candidateRow < NUMROWS; ++candidateRow) {
-    for (byte candidateCol = 1; candidateCol < NUMCOLS; ++candidateCol) {
+    int32_t touchedColumns = colsInRowsTouched[candidateRow] & ~(int32_t)1;
+    while (touchedColumns) {
+      byte candidateCol = __builtin_ctz((uint32_t)touchedColumns);
+      touchedColumns &= touchedColumns - 1;
       if (candidateRow == sensorRow && candidateCol == sensorCol) continue;
       if (getSplitOf(candidateCol) != sensorSplit) continue;
 

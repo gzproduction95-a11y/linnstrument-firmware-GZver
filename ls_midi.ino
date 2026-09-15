@@ -779,6 +779,9 @@ void receivedNrpn(int parameter, int value, int channel) {
     // Split Special
     case 35:
       if (inRange(value, 0, 4)) {
+        if (Split[split].strum == STRUM_DYNAMIC) {
+          resetConfiguredDynamicStrumRuntime(split);
+        }
         switch (value) {
           case 0:
             Split[split].arpeggiator = false;

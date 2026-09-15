@@ -330,6 +330,8 @@ void applySystemState() {
 void loadSettingsFromPreset(byte p) {
   Device.lastLoadedPreset = p;
 
+  resetConfiguredDynamicStrumRuntime(getConfiguredDynamicStrumSplit());
+
   memcpy(&Global, &config.preset[p].global, sizeof(GlobalSettings));
   memcpy(&Split[LEFT], &config.preset[p].split[LEFT], sizeof(SplitSettings));
   memcpy(&Split[RIGHT], &config.preset[p].split[RIGHT], sizeof(SplitSettings));
@@ -995,8 +997,7 @@ void handleControlButtonRelease() {
         }
         else {
           if (Global.splitActive && getConfiguredDynamicStrumSplit() != 255) {
-            clearDynamicTouchCells(getConfiguredDynamicStrumSplit());
-            resetDynamicRuntime();
+            resetConfiguredDynamicStrumRuntime(getConfiguredDynamicStrumSplit());
           }
           Global.splitActive = !Global.splitActive;
         }
@@ -1433,6 +1434,9 @@ void handlePerSplitSettingNewTouch() {
         case 7:
           Split[Global.currentPerSplit].arpeggiator = !Split[Global.currentPerSplit].arpeggiator;
           if (Split[Global.currentPerSplit].arpeggiator) {
+            if (Split[Global.currentPerSplit].strum == STRUM_DYNAMIC) {
+              resetConfiguredDynamicStrumRuntime(Global.currentPerSplit);
+            }
             Split[Global.currentPerSplit].strum = false;
             Split[Global.currentPerSplit].ccFaders = false;
             setSplitSequencerEnabled(Global.currentPerSplit, false);
@@ -1449,6 +1453,7 @@ void handlePerSplitSettingNewTouch() {
           setSplitSequencerEnabled(Global.currentPerSplit, !Split[Global.currentPerSplit].sequencer);
           Global.splitActive = false;
           if (Split[Global.currentPerSplit].sequencer) {
+            resetConfiguredDynamicStrumRuntime(getConfiguredDynamicStrumSplit());
             Split[Global.currentPerSplit].strum = false;
             Split[Global.currentPerSplit].arpeggiator = false;
             Split[Global.currentPerSplit].ccFaders = false;
@@ -1758,6 +1763,9 @@ void handlePerSplitSettingRelease() {
                                        Split[Global.currentPerSplit].ccFaders ? cellOn : cellOff)) {
             Split[Global.currentPerSplit].ccFaders = !Split[Global.currentPerSplit].ccFaders;
             if (Split[Global.currentPerSplit].ccFaders) {
+              if (Split[Global.currentPerSplit].strum == STRUM_DYNAMIC) {
+                resetConfiguredDynamicStrumRuntime(Global.currentPerSplit);
+              }
               Split[Global.currentPerSplit].arpeggiator = false;
               Split[Global.currentPerSplit].strum = false;
               setSplitSequencerEnabled(Global.currentPerSplit, false);
@@ -2423,6 +2431,11 @@ void handleTempoNewTouch() {
 
 void changeUserFirmwareMode(boolean active) {
   if (userFirmwareActive == active) return;
+
+  // Switching the system operating mode interrupts normal performance. Clear
+  // any Dynamic Strum runtime notes and touches before changing the mode while
+  // retaining the configured Dynamic setting for the next normal session.
+  resetConfiguredDynamicStrumRuntime(getConfiguredDynamicStrumSplit());
 
   userFirmwareActive = active;
 
