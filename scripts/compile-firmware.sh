@@ -5,15 +5,17 @@ set -eu
 project_dir=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
 build_name=${1:-current}
 build_dir="$project_dir/build/$build_name"
-stage_root=$(mktemp -d /private/tmp/linnstrument-build.XXXXXX)
+stage_root="$project_dir/.build-staging"
 stage_dir="$stage_root/linnstrument-firmware"
+rm -rf "$stage_root"
+mkdir -p "$stage_dir"
+mkdir -p "$build_dir"
 
 cleanup() {
   rm -rf "$stage_root"
 }
 trap cleanup EXIT INT TERM
 
-mkdir -p "$stage_dir" "$build_dir"
 cp "$project_dir"/*.ino "$project_dir"/*.h "$stage_dir"/
 
 env \

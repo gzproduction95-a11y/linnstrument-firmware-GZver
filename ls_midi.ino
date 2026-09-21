@@ -39,6 +39,7 @@ short midiSysExLength = -1;
 // MIDI Clock State
 const int32_t MIDI_CLOCK_UNIT = 2500000;    // 1000000 ( microsecond) * 60 ( minutes - bpm) / 24 ( frames per beat)
 const int32_t MIDI_CLOCK_MIN_DELTA = 6756;  // maximum 370 BPM (taking a little margin to allow for clock fluctuations)
+const unsigned long MIDI_CLOCK_TIMEOUT = 2000000UL; // fall back after 2 seconds without an external clock
 const byte MIDI_CLOCK_SAMPLES = 6;
 const int32_t FXD4_MIDI_CLOCK_SAMPLES = FXD4_FROM_INT(MIDI_CLOCK_SAMPLES);
 
@@ -55,6 +56,23 @@ byte midiClockMessageCount = 0;                            // the number of MIDI
 byte initialMidiClockMessageCount = 0;                     // the first MIDI clock messages, counted until the minimum number of samples have been received
 boolean receivedSongPositionPointer = false;               // tracks whether a song position pointer message was received before the MIDI clock start
 boolean standaloneMidiClockRunning = false;                // indicates whether the MIDI Clock is sending data in a standalone fashion, without sequencer
+
+void stopMidiClockSynchronization(unsigned long nowMicros) {
+  midiClockStatus = midiClockOff;
+  midiClockMessageCount = 0;
+  lastMidiClockTime = 0;
+  initialMidiClockMessageCount = 0;
+  resetClockAdvancement(nowMicros);
+  clock24PPQ = 0;
+}
+
+void checkMidiClockTimeout(unsigned long nowMicros) {
+  if (midiClockStatus == midiClockOn &&
+      lastMidiClockTime != 0 &&
+      calcTimeDelta(nowMicros, lastMidiClockTime) > MIDI_CLOCK_TIMEOUT) {
+    stopMidiClockSynchronization(nowMicros);
+  }
+}
 
 byte lastRpnMsb = 127;
 byte lastRpnLsb = 127;
@@ -89,6 +107,7 @@ void applyMidiIo() {
 }
 
 void handleMidiInput(unsigned long nowMicros) {
+  checkMidiClockTimeout(nowMicros);
   // handle turning off the MIDI clock led after minimum 30ms
   if (isSyncedToMidiClock() &&
       controlButton != GLOBAL_SETTINGS_ROW &&
@@ -145,11 +164,7 @@ void handleMidiInput(unsigned long nowMicros) {
 
         sequencersTurnOff(false);
 
-        midiClockStatus = midiClockOff;
-        midiClockMessageCount = 0;
-        lastMidiClockTime = 0;
-        initialMidiClockMessageCount = 0;
-        resetClockAdvancement(nowMicros);
+        stopMidiClockSynchronization(nowMicros);
         break;
       case MIDISongPositionPointer:
         midiMessageBytes = 3;

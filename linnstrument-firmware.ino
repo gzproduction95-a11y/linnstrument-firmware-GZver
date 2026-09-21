@@ -1170,6 +1170,7 @@ boolean switchPressAtStartup(byte switchRow) {
 
 void activateSleepMode() {
   clearSwitches();
+  stopMidiClockSynchronization(micros());
   clearDisplayImmediately();
   setDisplayMode(displaySleep);
 }
