@@ -32,7 +32,10 @@ inline int16_t harpejjiNoteNumber(int16_t basePitch,
                                  int16_t transposeOctave,
                                  int16_t transposePitch,
                                  int16_t transposeLights) {
-  return basePitch + (row * 2) + colOffset + transposeOctave +
+  // The instrument is used with the control edge nearest the player. In
+  // that physical orientation, increasing the firmware row index moves left,
+  // so the visible string index is reversed before applying the +2 interval.
+  return basePitch + ((7 - row) * 2) + colOffset + transposeOctave +
          transposePitch - transposeLights;
 }
 
@@ -44,7 +47,7 @@ inline int16_t harpejjiNoteColumn(int16_t basePitch,
                                  int16_t transposeLights,
                                  int16_t numCols,
                                  bool leftHanded) {
-  int16_t rowBase = basePitch + (row * 2) + transposeOctave +
+  int16_t rowBase = basePitch + ((7 - row) * 2) + transposeOctave +
                     transposePitch - transposeLights;
   int16_t noteCol = midiNote - rowBase + 1;
   return leftHanded ? numCols - noteCol : noteCol;

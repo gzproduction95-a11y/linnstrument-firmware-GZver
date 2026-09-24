@@ -4,6 +4,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 MIDI_SOURCE = (ROOT / "ls_midi.ino").read_text()
 HARPEJJI_SOURCE = (ROOT / "ls_harpejji.ino").read_text()
+HARPEJJI_HEADER = (ROOT / "ls_harpejji.h").read_text()
 TOUCH_SOURCE = (ROOT / "ls_handleTouches.ino").read_text()
 SETTINGS_SOURCE = (ROOT / "ls_settings.ino").read_text()
 SWITCH_SOURCE = (ROOT / "ls_switches.ino").read_text()
@@ -14,6 +15,7 @@ MIDI_CONTROL_SOURCE = (ROOT / "ls_midi.ino").read_text()
 assert "getHarpejjiNoteNumColumn" in HARPEJJI_SOURCE
 assert "if (isHarpejjiLayoutActive())" in MIDI_SOURCE
 assert "return getHarpejjiNoteNumColumn(split, notenum, row);" in MIDI_SOURCE
+assert "((7 - row) * 2)" in HARPEJJI_HEADER
 
 assert "harpejjiOneChannelXEnabled[2]" in HARPEJJI_SOURCE
 assert "boolean effectiveSendX(byte split)" in HARPEJJI_SOURCE
@@ -32,6 +34,7 @@ assert "boolean lowRowSpecialBehaviorActive(byte split)" in HARPEJJI_SOURCE
 assert "!isHarpejjiLayoutActive() && Split[split].lowRowMode != lowRowNormal" in HARPEJJI_SOURCE
 assert "lowRowSpecialBehaviorActive(sensorSplit)" in LOWROW_SOURCE
 assert "lowRowSpecialBehaviorActive(split)" in DISPLAY_SOURCE
+assert "!lowRowSpecialBehaviorActive(split) || row != 0" in MIDI_SOURCE
 
 FIRMWARE_SOURCE = (ROOT / "linnstrument-firmware.ino").read_text()
 assert "#define SCALAR_LAYOUT_SETTINGS_COL 19" in FIRMWARE_SOURCE

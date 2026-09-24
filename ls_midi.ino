@@ -1740,7 +1740,7 @@ boolean highlightExactNoteCell(byte split, byte notenum, byte channel) {
 
   byte row = calculateRowPerChannelRow(split, channel);
   if (row < NUMROWS &&                                            // it's not possible to display cells on rows that don't exist
-      (Split[split].lowRowMode == lowRowNormal || row != 0)) {    // it's not possible to display cells on the low row if it's active
+      (!lowRowSpecialBehaviorActive(split) || row != 0)) {         // Harpejji temporarily keeps the low row playable
 
     short col = getNoteNumColumn(split, notenum, row);
     if (col > 0) {
@@ -1777,7 +1777,7 @@ void highlightPossibleNoteCells(byte split, byte notenum) {
   if (isVisibleSequencerForSplit(split)) return;
 
   byte row = 0;
-  if (Split[split].lowRowMode != lowRowNormal) {
+  if (lowRowSpecialBehaviorActive(split)) {
     row = 1;
   }
   for (; row < NUMROWS; ++row) {
@@ -1795,7 +1795,7 @@ boolean resetExactNoteCell(byte split, byte notenum, byte channel) {
 
   byte row = calculateRowPerChannelRow(split, channel);
   if (row < NUMROWS &&                                            // it's not possible to display cells on rows that don't exist
-      (Split[split].lowRowMode == lowRowNormal || row != 0)) {    // it's not possible to display cells on the low row if it's active
+      (!lowRowSpecialBehaviorActive(split) || row != 0)) {         // Harpejji temporarily keeps the low row playable
 
     short col = getNoteNumColumn(split, notenum, row);
     if (col > 0) {
@@ -1813,7 +1813,7 @@ void resetPossibleNoteCells(byte split, byte notenum) {
   if (isVisibleSequencerForSplit(split)) return;
   
   byte row = 0;
-  if (Split[split].lowRowMode != lowRowNormal) {
+  if (lowRowSpecialBehaviorActive(split)) {
     row = 1;
   }
   for (; row < NUMROWS; ++row) {

@@ -6,13 +6,13 @@ int main() {
   assert(harpejjiLayoutMode(false, false) == 0);
   assert(harpejjiLayoutMode(true, false) == 1);
   assert(harpejjiLayoutMode(true, true) == 2);
-  assert(harpejjiNoteNumber(30, 0, 0, 0, 0, 0) == 30);
-  assert(harpejjiNoteNumber(30, 0, 7, 0, 0, 0) == 37);
-  assert(harpejjiNoteNumber(30, 1, 0, 0, 0, 0) == 32);
-  assert(harpejjiNoteNumber(30, 0, 1, 0, 0, 0) == 31);
-  assert(harpejjiNoteNumber(30, 7, 24, 0, 0, 0) == 68);
-  assert(harpejjiNoteNumber(30, 7, 0, 0, 0, 0) == 44);
-  assert(harpejjiNoteNumber(30, 0, 0, -12, 2, 0) == 20);
+  assert(harpejjiNoteNumber(30, 0, 0, 0, 0, 0) == 44);
+  assert(harpejjiNoteNumber(30, 0, 7, 0, 0, 0) == 51);
+  assert(harpejjiNoteNumber(30, 1, 0, 0, 0, 0) == 42);
+  assert(harpejjiNoteNumber(30, 0, 1, 0, 0, 0) == 45);
+  assert(harpejjiNoteNumber(30, 7, 24, 0, 0, 0) == 54);
+  assert(harpejjiNoteNumber(30, 7, 0, 0, 0, 0) == 30);
+  assert(harpejjiNoteNumber(30, 0, 0, -12, 2, 0) == 34);
   assert(harpejjiYBendUnits(0) == -171);
   assert(harpejjiYBendUnits(63) == 0);
   assert(harpejjiYBendUnits(64) == 0);
@@ -20,12 +20,12 @@ int main() {
   assert(harpejjiCombinedBend(1197, 171) == 1368);
   assert(harpejjiCombinedBend(1197, -171) == 1026);
 
-  assert(harpejjiNoteColumn(30, 0, 30, 0, 0, 0, 26, false) == 1);
-  assert(harpejjiNoteColumn(30, 7, 44, 0, 0, 0, 26, false) == 1);
-  assert(harpejjiNoteColumn(30, 3, 48, 12, 0, 0, 26, false) == 1);
-  assert(harpejjiNoteColumn(30, 0, 30, 0, 0, 0, 26, true) == 25);
-  assert(harpejjiNoteColumn(30, 0, 42, 0, 0, 0, 26, false) == 13);
-  assert(harpejjiNoteColumn(30, 2, 39, 0, 2, -1, 26, false) == 3);
+  assert(harpejjiNoteColumn(30, 0, 44, 0, 0, 0, 26, false) == 1);
+  assert(harpejjiNoteColumn(30, 7, 30, 0, 0, 0, 26, false) == 1);
+  assert(harpejjiNoteColumn(30, 3, 50, 12, 0, 0, 26, false) == 1);
+  assert(harpejjiNoteColumn(30, 0, 44, 0, 0, 0, 26, true) == 25);
+  assert(harpejjiNoteColumn(30, 0, 56, 0, 0, 0, 26, false) == 13);
+  assert(harpejjiNoteColumn(30, 2, 45, 0, 2, -1, 26, false) == 3);
 
   for (int16_t row = 0; row < 8; ++row) {
     for (int16_t col = 1; col < 26; ++col) {
