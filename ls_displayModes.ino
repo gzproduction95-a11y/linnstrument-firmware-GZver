@@ -450,7 +450,7 @@ void paintNormalDisplaySplit(byte split, byte leftEdge, byte rightEdge) {
         paintNormalDisplayCell(split, col, row);
       }
 
-      if (!userFirmwareActive && row == 0 && Split[split].lowRowMode != lowRowNormal) {
+      if (!userFirmwareActive && row == 0 && lowRowSpecialBehaviorActive(split)) {
         if (Split[split].lowRowMode == lowRowBend && Split[split].lowRowBendBehavior == lowRowBendTranspose) {
           paintLowRowTranspose(split);
         }
@@ -620,10 +620,10 @@ void paintNormalDisplayCell(byte split, byte col, byte row) {
   }
 
   // if the low row is anything but normal, set it to the appropriate color
-  if (row == 0 && Split[split].lowRowMode == lowRowBend && Split[split].lowRowBendBehavior == lowRowBendTranspose) {
+  if (row == 0 && lowRowSpecialBehaviorActive(split) && Split[split].lowRowMode == lowRowBend && Split[split].lowRowBendBehavior == lowRowBendTranspose) {
     // do nothing, this is handled in the paintLowRowTranspose method for all situations 
   }
-  else if (row == 0 && Split[split].lowRowMode != lowRowNormal) {
+  else if (row == 0 && lowRowSpecialBehaviorActive(split)) {
     if ((Split[split].lowRowMode == lowRowCCX && Split[split].lowRowCCXBehavior == lowRowCCFader) ||
         (Split[split].lowRowMode == lowRowCCXYZ && Split[split].lowRowCCXYZBehavior == lowRowCCFader)) {
       colour = COLOR_BLACK;
@@ -702,7 +702,7 @@ void paintPerSplitDisplay(byte side) {
   }
 
   // set Pitch/X settings
-  if (Split[side].sendX == true)  {
+  if (effectiveSendX(side))  {
     setLed(8, 7, Split[side].colorMain, cellOn);
   }
 
@@ -1737,7 +1737,7 @@ void paintGlobalSettingsDisplay() {
     if (Device.harpejjiLayoutEnabled) {
       setLed(HARPEJJI_LAYOUT_SETTINGS_COL,
              HARPEJJI_LAYOUT_SETTINGS_ROW,
-             COLOR_ORANGE,
+             COLOR_WHITE,
              cellOn);
     }
   }

@@ -10,6 +10,36 @@ boolean isHarpejjiLayoutActive() {
   return Device.harpejjiLayoutEnabled && displayMode == displayNormal;
 }
 
+boolean lowRowSpecialBehaviorActive(byte split) {
+  return !isHarpejjiLayoutActive() && Split[split].lowRowMode != lowRowNormal;
+}
+
+boolean harpejjiOneChannelXEnabled[2] = { false, false };
+
+void resetHarpejjiOneChannelX(byte split) {
+  harpejjiOneChannelXEnabled[split] = false;
+}
+
+boolean effectiveSendX(byte split) {
+  if (Device.harpejjiLayoutEnabled && Split[split].midiMode == oneChannel) {
+    return harpejjiOneChannelXEnabled[split];
+  }
+  return Split[split].sendX;
+}
+
+void setEffectiveSendX(byte split, boolean enabled) {
+  if (Device.harpejjiLayoutEnabled && Split[split].midiMode == oneChannel) {
+    harpejjiOneChannelXEnabled[split] = enabled;
+  }
+  else {
+    Split[split].sendX = enabled;
+  }
+}
+
+void toggleEffectiveSendX(byte split) {
+  setEffectiveSendX(split, !effectiveSendX(split));
+}
+
 short getHarpejjiLayoutNoteNumber(byte split, byte col, byte row) {
   short noteCol = col;
   if (isLeftHandedSplit(split)) {
@@ -42,6 +72,10 @@ short getHarpejjiNoteNumColumn(byte split, byte midiNote, byte row) {
 }
 
 void setCustomLayoutMode(HarpejjiLayoutMode mode) {
+  if (mode == HARPEJJI_LAYOUT_HARPEJJI) {
+    resetHarpejjiOneChannelX(LEFT);
+    resetHarpejjiOneChannelX(RIGHT);
+  }
   Device.scalarLayoutEnabled = mode == HARPEJJI_LAYOUT_SCALAR_3X4;
   Device.harpejjiLayoutEnabled = mode == HARPEJJI_LAYOUT_HARPEJJI;
 }

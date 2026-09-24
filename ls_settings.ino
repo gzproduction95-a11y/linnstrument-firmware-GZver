@@ -336,6 +336,9 @@ void loadSettingsFromPreset(byte p) {
   memcpy(&Split[LEFT], &config.preset[p].split[LEFT], sizeof(SplitSettings));
   memcpy(&Split[RIGHT], &config.preset[p].split[RIGHT], sizeof(SplitSettings));
 
+  resetHarpejjiOneChannelX(LEFT);
+  resetHarpejjiOneChannelX(RIGHT);
+
   applyPresetSettings();
 }
 
@@ -1235,6 +1238,9 @@ void handlePerSplitSettingNewTouch() {
           preResetMidiExpression(Global.currentPerSplit);
 
           Split[Global.currentPerSplit].midiMode = 7 - sensorRow;    // values are 0, 1, 2
+          if (Split[Global.currentPerSplit].midiMode == oneChannel) {
+            resetHarpejjiOneChannelX(Global.currentPerSplit);
+          }
           if (sensorRow != 6) {
             setSplitMpeMode(Global.currentPerSplit, false);
           }
@@ -1297,7 +1303,7 @@ void handlePerSplitSettingNewTouch() {
       switch (sensorRow) {
         case 7:
           preSendPitchBend(Global.currentPerSplit, 0);
-          Split[Global.currentPerSplit].sendX = !Split[Global.currentPerSplit].sendX;
+          toggleEffectiveSendX(Global.currentPerSplit);
           break;
         case 6:
           Split[Global.currentPerSplit].pitchCorrectQuantize = !Split[Global.currentPerSplit].pitchCorrectQuantize;

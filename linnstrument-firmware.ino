@@ -108,8 +108,8 @@ byte NUMROWS = 8;                    // number of touch sensor rows
 // unused by the stock LinnStrument 200 Global Settings surface.
 #define SCALAR_LAYOUT_SETTINGS_COL 19
 #define SCALAR_LAYOUT_SETTINGS_ROW 0
-#define HARPEJJI_LAYOUT_SETTINGS_COL 19
-#define HARPEJJI_LAYOUT_SETTINGS_ROW 1
+#define HARPEJJI_LAYOUT_SETTINGS_COL 20
+#define HARPEJJI_LAYOUT_SETTINGS_ROW 0
 
 // Special row offset values, for legacy reasons
 #define ROWOFFSET_NOOVERLAP        0x00

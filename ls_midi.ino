@@ -656,6 +656,9 @@ void receivedNrpn(int parameter, int value, int channel) {
       if (inRange(value, 0, 2)) {
         preResetMidiExpression(split);
         Split[split].midiMode = value;
+        if (Split[split].midiMode == oneChannel) {
+          resetHarpejjiOneChannelX(split);
+        }
         // ensure MPE is turned off
         disableMpe(split);
         updateSplitMidiChannels(split);
@@ -700,7 +703,7 @@ void receivedNrpn(int parameter, int value, int channel) {
     case 20:
       if (inRange(value, 0, 1)) {
         preSendPitchBend(split, 0);
-        Split[split].sendX = value;
+        setEffectiveSendX(split, value);
       }
       break;
     // Split Pitch Quantize
@@ -1405,7 +1408,7 @@ void sendNrpnParameter(int parameter, int channel) {
       value = getBendRange(split);
       break;
     case 20:
-      value = Split[split].sendX;
+      value = effectiveSendX(split);
       break;
     case 21:
       value = Split[split].pitchCorrectQuantize;

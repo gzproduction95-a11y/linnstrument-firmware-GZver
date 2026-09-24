@@ -76,7 +76,7 @@ boolean potentialSlideTransferCandidate(byte col) {
   else {
     if (sensorSplit != getSplitOf(col)) return false;
     if (!isLowRow() &&                                                   // don't perform slide transfers
-        (!Split[sensorSplit].sendX ||                                    // if pitch slides are disabled
+        (!effectiveSendX(sensorSplit) ||                                 // if pitch slides are disabled
          !isFocusedCell(col, sensorRow) ||                               // if this is not a focused cell
          countTouchesForMidiChannel(sensorSplit, col, sensorRow) > 1)) { // when there are several touches for the same MIDI channel
       return false;
@@ -987,7 +987,7 @@ boolean handleXYZupdate() {
       if (isHarpejjiLayoutActive() &&
           (valueX != INVALID_DATA || valueY != INVALID_DATA) &&
           isXExpressiveCell() && !isLowRowBendActive(sensorSplit)) {
-        int pitch = Split[sensorSplit].sendX && valueX != INVALID_DATA ? valueX : 0;
+        int pitch = effectiveSendX(sensorSplit) && valueX != INVALID_DATA ? valueX : 0;
         if (valueY != INVALID_DATA) {
           pitch = harpejjiCombinedBend(pitch, harpejjiYBendUnits(valueY));
         }
@@ -1133,7 +1133,7 @@ void handleStrummedOpenRow(byte split, byte velocity) {
   // use the velocity of the strum touch
   virtualCell().velocity = velocity;
 
-  if (Split[split].sendX && !isLowRowBendActive(split)) {
+  if (effectiveSendX(split) && !isLowRowBendActive(split)) {
     resetLastMidiPitchBend(virtualCell().channel);
     preSendPitchBend(split, 0, virtualCell().channel);
   }
@@ -1251,7 +1251,7 @@ void prepareNewNote(signed char notenum) {
 
   // reset the pitch bend and pressure right before sending the note on
   if (!userFirmwareActive) {
-    if ((Split[sensorSplit].sendX || isHarpejjiLayoutActive()) && isXExpressiveCell() && !isLowRowBendActive(sensorSplit)) {
+    if ((effectiveSendX(sensorSplit) || isHarpejjiLayoutActive()) && isXExpressiveCell() && !isLowRowBendActive(sensorSplit)) {
       resetLastMidiPitchBend(sensorCell->channel);
     }
     if (Split[sensorSplit].sendZ && isZExpressiveCell()) {

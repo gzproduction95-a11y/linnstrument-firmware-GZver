@@ -37,7 +37,7 @@ short lastRestrikeColumn[NUMSPLITS];
 
 inline boolean isLowRow() {
   if (sensorRow != 0) return false;
-  if (Split[sensorSplit].lowRowMode == lowRowNormal) return false;
+  if (!lowRowSpecialBehaviorActive(sensorSplit)) return false;
   if (Split[sensorSplit].ccFaders) return false;
   if (Split[sensorSplit].sequencer) return false;
   if (isStrummingSplit(sensorSplit)) return false;
@@ -475,7 +475,7 @@ inline boolean isLowRowSustainPressed(byte split) {
 }
 
 inline boolean isLowRowBendActive(byte split) {
-  return lowRowBendActive[split];
+  return !isHarpejjiLayoutActive() && lowRowBendActive[split];
 }
 
 inline boolean isLowRowCCXActive(byte split) {
