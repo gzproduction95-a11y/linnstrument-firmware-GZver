@@ -36,6 +36,20 @@ inline int16_t harpejjiNoteNumber(int16_t basePitch,
          transposePitch - transposeLights;
 }
 
+inline int16_t harpejjiNoteColumn(int16_t basePitch,
+                                 int16_t row,
+                                 int16_t midiNote,
+                                 int16_t transposeOctave,
+                                 int16_t transposePitch,
+                                 int16_t transposeLights,
+                                 int16_t numCols,
+                                 bool leftHanded) {
+  int16_t rowBase = basePitch + (row * 2) + transposeOctave +
+                    transposePitch - transposeLights;
+  int16_t noteCol = midiNote - rowBase + 1;
+  return leftHanded ? numCols - noteCol : noteCol;
+}
+
 // Calibrated Y reads 63 and 64 straddle center; both map to zero to avoid
 // a one-unit bend bias or jitter at rest. The two calibrated endpoints map
 // symmetrically to +/- one semitone.

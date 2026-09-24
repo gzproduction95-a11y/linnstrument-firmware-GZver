@@ -19,4 +19,20 @@ int main() {
   assert(harpejjiYBendUnits(127) == 171);
   assert(harpejjiCombinedBend(1197, 171) == 1368);
   assert(harpejjiCombinedBend(1197, -171) == 1026);
+
+  assert(harpejjiNoteColumn(30, 0, 30, 0, 0, 0, 26, false) == 1);
+  assert(harpejjiNoteColumn(30, 7, 44, 0, 0, 0, 26, false) == 1);
+  assert(harpejjiNoteColumn(30, 3, 48, 12, 0, 0, 26, false) == 1);
+  assert(harpejjiNoteColumn(30, 0, 30, 0, 0, 0, 26, true) == 25);
+  assert(harpejjiNoteColumn(30, 0, 42, 0, 0, 0, 26, false) == 13);
+  assert(harpejjiNoteColumn(30, 2, 39, 0, 2, -1, 26, false) == 3);
+
+  for (int16_t row = 0; row < 8; ++row) {
+    for (int16_t col = 1; col < 26; ++col) {
+      int16_t note = harpejjiNoteNumber(30, row, col - 1, 0, 0, 0);
+      assert(harpejjiNoteColumn(30, row, note, 0, 0, 0, 26, false) == col);
+      int16_t leftNote = harpejjiNoteNumber(30, row, 26 - col - 1, 0, 0, 0);
+      assert(harpejjiNoteColumn(30, row, leftNote, 0, 0, 0, 26, true) == col);
+    }
+  }
 }
