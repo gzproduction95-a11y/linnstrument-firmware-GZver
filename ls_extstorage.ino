@@ -927,6 +927,40 @@ struct ConfigurationV16 {
   PresetSettingsV11 preset[NUMPRESETS];
   SequencerProject project;
 };
+struct DeviceSettingsV18 {
+  byte version;
+  boolean serialMode;
+  CalibrationX calRows[MAXCOLS+1][4];
+  CalibrationY calCols[9][MAXROWS];
+  uint32_t calCrc;
+  boolean calCrcCalculated;
+  boolean calibrated;
+  boolean calibrationHealed;
+  unsigned short minUSBMIDIInterval;
+  byte sensorSensitivityZ;
+  unsigned short sensorLoZ;
+  unsigned short sensorFeatherZ;
+  unsigned short sensorRangeZ;
+  boolean sleepAnimationActive;
+  boolean sleepActive;
+  byte sleepDelay;
+  byte sleepAnimationType;
+  char audienceMessages[16][31];
+  boolean operatingLowPower;
+  boolean otherHanded;
+  byte splitHandedness;
+  boolean midiThrough;
+  short lastLoadedPreset;
+  short lastLoadedProject;
+  byte customLeds[LED_PATTERNS][LED_LAYER_SIZE];
+  boolean scalarLayoutEnabled;
+};
+struct ConfigurationV18 {
+  DeviceSettingsV18 device;
+  PresetSettings settings;
+  PresetSettings preset[NUMPRESETS];
+  SequencerProject project;
+};
 struct ConfigurationV17 {
   DeviceSettingsV13 device;
   PresetSettingsV11 settings;
@@ -1051,8 +1085,14 @@ boolean upgradeConfigurationSettings(int32_t confSize, byte* buff2) {
           copyConfigurationFunction = &copyConfigurationV17;
         }
         break;
-      // this is the current v18 configuration
+      // v18 adds Scalar Layout and preserves the x6 settings payload.
       case 18:
+        if (confSize == sizeof(ConfigurationV18)) {
+          copyConfigurationFunction = &copyConfigurationV18;
+        }
+        break;
+      // v19 is the current configuration with the Harpejji layout flag.
+      case 19:
         if (confSize == sizeof(Configuration)) {
           memcpy(&config, buff2, confSize);
           result = true;
@@ -2335,6 +2375,19 @@ void copyConfigurationV16(void* target, void* source) {
 }
 
 /*************************************************************************************************/
+
+void copyConfigurationV18(void* target, void* source) {
+  Configuration* t = (Configuration*)target;
+  ConfigurationV18* s = (ConfigurationV18*)source;
+
+  memcpy(&t->device, &s->device, sizeof(DeviceSettingsV18));
+  t->device.harpejjiLayoutEnabled = false;
+  memcpy(&t->settings, &s->settings, sizeof(PresetSettings));
+  for (byte p = 0; p < NUMPRESETS; ++p) {
+    memcpy(&t->preset[p], &s->preset[p], sizeof(PresetSettings));
+  }
+  memcpy(&t->project, &s->project, sizeof(SequencerProject));
+}
 
 void copyConfigurationV17(void* target, void* source) {
   Configuration* t = (Configuration*)target;

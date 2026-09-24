@@ -575,7 +575,11 @@ void paintNormalDisplayCell(byte split, byte col, byte row) {
 
   short displayedNote;
   short actualnote;
-  if (Device.scalarLayoutEnabled) {
+  if (isHarpejjiLayoutActive()) {
+    displayedNote = getHarpejjiLayoutNoteNumber(split, col, row);
+    actualnote = displayedNote;
+  }
+  else if (Device.scalarLayoutEnabled) {
     displayedNote = getScalarLayoutNoteNumber(split, col, row) + Split[split].transposeOctave;
     actualnote = displayedNote + Split[split].transposePitch;
   }
@@ -1681,13 +1685,18 @@ inline void paintGlobalSettingsFlashTempo(unsigned long now, byte col, byte row)
     // flash the tap tempo cell at the beginning of the beat
     if (flash_on) {
       lightLed(col, row);
-      // When Scalar Layout is off, its Global Settings switch is a direct
-      // mirror of the Tap Tempo flash: same beat, phase, and pulse length.
+      // Unselected custom-layout switches mirror Tap Tempo as a discovery cue.
       if (col == 14 && row == 3 &&
           !Device.scalarLayoutEnabled &&
           LINNMODEL == 200 &&
           (displayMode == displayGlobal || displayMode == displayGlobalWithTempo)) {
         setLed(SCALAR_LAYOUT_SETTINGS_COL, SCALAR_LAYOUT_SETTINGS_ROW, COLOR_BLUE, cellOn);
+      }
+      if (col == 14 && row == 3 &&
+          !Device.harpejjiLayoutEnabled &&
+          LINNMODEL == 200 &&
+          (displayMode == displayGlobal || displayMode == displayGlobalWithTempo)) {
+        setLed(HARPEJJI_LAYOUT_SETTINGS_COL, HARPEJJI_LAYOUT_SETTINGS_ROW, COLOR_BLUE, cellOn);
       }
       tempoLedOn = now;
     }
@@ -1701,6 +1710,12 @@ inline void paintGlobalSettingsFlashTempo(unsigned long now, byte col, byte row)
           LINNMODEL == 200 &&
           (displayMode == displayGlobal || displayMode == displayGlobalWithTempo)) {
         clearLed(SCALAR_LAYOUT_SETTINGS_COL, SCALAR_LAYOUT_SETTINGS_ROW);
+      }
+      if (col == 14 && row == 3 &&
+          !Device.harpejjiLayoutEnabled &&
+          LINNMODEL == 200 &&
+          (displayMode == displayGlobal || displayMode == displayGlobalWithTempo)) {
+        clearLed(HARPEJJI_LAYOUT_SETTINGS_COL, HARPEJJI_LAYOUT_SETTINGS_ROW);
       }
     }
   }
@@ -1717,6 +1732,12 @@ void paintGlobalSettingsDisplay() {
       setLed(SCALAR_LAYOUT_SETTINGS_COL,
              SCALAR_LAYOUT_SETTINGS_ROW,
              COLOR_WHITE,
+             cellOn);
+    }
+    if (Device.harpejjiLayoutEnabled) {
+      setLed(HARPEJJI_LAYOUT_SETTINGS_COL,
+             HARPEJJI_LAYOUT_SETTINGS_ROW,
+             COLOR_ORANGE,
              cellOn);
     }
   }

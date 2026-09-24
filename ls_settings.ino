@@ -348,7 +348,7 @@ void storeSettingsToPreset(byte p) {
 // The first time after new code is loaded into the Linnstrument, this sets the initial defaults of all settings.
 // On subsequent startups, these values are overwritten by loading the settings stored in flash.
 void initializeDeviceSettings() {
-  Device.version = 18;
+  Device.version = 19;
   Device.serialMode = false;
   Device.sleepAnimationActive = false;
   Device.sleepActive = false;
@@ -362,6 +362,7 @@ void initializeDeviceSettings() {
   Device.lastLoadedPreset = -1;
   Device.lastLoadedProject = -1;
   Device.scalarLayoutEnabled = false;
+  Device.harpejjiLayoutEnabled = false;
   Global.splitActive = false;
 
   initializeAudienceMessages();
@@ -2498,6 +2499,19 @@ void handleGlobalSettingNewTouch() {
   // Global Settings surface. This is intentionally outside every stock
   // control group on LinnStrument 200.
   if (LINNMODEL == 200 &&
+      sensorCol == HARPEJJI_LAYOUT_SETTINGS_COL &&
+      sensorRow == HARPEJJI_LAYOUT_SETTINGS_ROW) {
+    boolean nextHarpejjiState = !Device.harpejjiLayoutEnabled;
+    if (userFirmwareActive) {
+      changeUserFirmwareMode(false);
+      setDisplayMode(displayGlobal);
+    }
+    setCustomLayoutMode(nextHarpejjiState ? HARPEJJI_LAYOUT_HARPEJJI : HARPEJJI_LAYOUT_NORMAL);
+    updateDisplay();
+    return;
+  }
+
+  if (LINNMODEL == 200 &&
       sensorCol == SCALAR_LAYOUT_SETTINGS_COL &&
       sensorRow == SCALAR_LAYOUT_SETTINGS_ROW) {
     // If User Firmware Mode was entered accidentally, this dedicated custom
@@ -2507,11 +2521,11 @@ void handleGlobalSettingNewTouch() {
     boolean nextScalarState = !Device.scalarLayoutEnabled;
     if (userFirmwareActive) {
       changeUserFirmwareMode(false);
-      Device.scalarLayoutEnabled = nextScalarState;
+      setCustomLayoutMode(nextScalarState ? HARPEJJI_LAYOUT_SCALAR_3X4 : HARPEJJI_LAYOUT_NORMAL);
       setDisplayMode(displayGlobal);
     }
     else {
-      Device.scalarLayoutEnabled = nextScalarState;
+      setCustomLayoutMode(nextScalarState ? HARPEJJI_LAYOUT_SCALAR_3X4 : HARPEJJI_LAYOUT_NORMAL);
     }
     updateDisplay();
     return;

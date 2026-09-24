@@ -41,12 +41,13 @@ For any questions about this, contact Roger Linn Design at support@rogerlinndesi
 #include "ls_debug.h"
 #include "ls_channelbucket.h"
 #include "ls_midi.h"
+#include "ls_harpejji.h"
 
 
 /******************************************** CONSTANTS ******************************************/
 
-const char* OSVersion = "234-x6";
-const char* OSVersionBuild = "234-x6";
+const char* OSVersion = "234-x7";
+const char* OSVersionBuild = "234-x7";
 
 #define STRUM_OFF 0
 #define STRUM_CLASSIC 1
@@ -107,6 +108,8 @@ byte NUMROWS = 8;                    // number of touch sensor rows
 // unused by the stock LinnStrument 200 Global Settings surface.
 #define SCALAR_LAYOUT_SETTINGS_COL 19
 #define SCALAR_LAYOUT_SETTINGS_ROW 0
+#define HARPEJJI_LAYOUT_SETTINGS_COL 19
+#define HARPEJJI_LAYOUT_SETTINGS_ROW 1
 
 // Special row offset values, for legacy reasons
 #define ROWOFFSET_NOOVERLAP        0x00
@@ -716,6 +719,7 @@ struct DeviceSettings {
   short lastLoadedProject;                        // the last sequencer project that was loaded
   byte customLeds[LED_PATTERNS][LED_LAYER_SIZE];  // the custom LEDs that persist across power cycle
   boolean scalarLayoutEnabled;                   // global 3x4 Scalar Layout switch
+  boolean harpejjiLayoutEnabled;                 // global Harpejji Layout switch
 };
 #define Device config.device
 

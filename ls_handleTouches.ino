@@ -504,6 +504,9 @@ boolean handleNewTouch() {
 
 // Calculate the transposed note number for the current cell by taken the transposition settings into account
 short cellTransposedNote(byte split) {
+  if (isHarpejjiLayoutActive()) {
+    return getHarpejjiLayoutNoteNumber(split, sensorCol, sensorRow);
+  }
   if (Device.scalarLayoutEnabled && displayMode == displayNormal) {
     return getScalarLayoutNoteNumber(split, sensorCol, sensorRow) +
            Split[split].transposePitch + Split[split].transposeOctave;
@@ -512,6 +515,9 @@ short cellTransposedNote(byte split) {
 }
 
 short transposedNote(byte split, byte col, byte row) {
+  if (isHarpejjiLayoutActive()) {
+    return getHarpejjiLayoutNoteNumber(split, col, row);
+  }
   return getNoteNumber(split, col, row) + Split[split].transposePitch + Split[split].transposeOctave;
 }
 
@@ -978,7 +984,17 @@ boolean handleXYZupdate() {
       
       // if X-axis movements are enabled and it's a candidate for
       // X/Y expression based on the MIDI mode and the currently held down cells
-      if (valueX != INVALID_DATA &&
+      if (isHarpejjiLayoutActive() &&
+          (valueX != INVALID_DATA || valueY != INVALID_DATA) &&
+          isXExpressiveCell() && !isLowRowBendActive(sensorSplit)) {
+        int pitch = Split[sensorSplit].sendX && valueX != INVALID_DATA ? valueX : 0;
+        if (valueY != INVALID_DATA) {
+          pitch = harpejjiCombinedBend(pitch, harpejjiYBendUnits(valueY));
+        }
+        preSendPitchBend(sensorSplit, pitch, sensorCell->channel);
+      }
+
+      if (!isHarpejjiLayoutActive() && valueX != INVALID_DATA &&
           Split[sensorSplit].sendX && isXExpressiveCell() && !isLowRowBendActive(sensorSplit)) {
 
         int pitch = valueX;
@@ -1045,7 +1061,7 @@ boolean handleXYZupdate() {
 
       // if Y-axis movements are enabled and it's a candidate for
       // X/Y expression based on the MIDI mode and the currently held down cells
-      if (valueY != INVALID_DATA &&
+      if (!isHarpejjiLayoutActive() && valueY != INVALID_DATA &&
           Split[sensorSplit].sendY && isYExpressiveCell()) {
         preSendTimbre(sensorSplit, valueY, sensorCell->note, sensorCell->channel);
       }
@@ -1235,13 +1251,13 @@ void prepareNewNote(signed char notenum) {
 
   // reset the pitch bend and pressure right before sending the note on
   if (!userFirmwareActive) {
-    if (Split[sensorSplit].sendX && isXExpressiveCell() && !isLowRowBendActive(sensorSplit)) {
+    if ((Split[sensorSplit].sendX || isHarpejjiLayoutActive()) && isXExpressiveCell() && !isLowRowBendActive(sensorSplit)) {
       resetLastMidiPitchBend(sensorCell->channel);
     }
     if (Split[sensorSplit].sendZ && isZExpressiveCell()) {
       preResetLastLoudness(sensorSplit, sensorCell->note, sensorCell->channel);
     }
-    if (Split[sensorSplit].sendY && isYExpressiveCell()) {
+    if (!isHarpejjiLayoutActive() && Split[sensorSplit].sendY && isYExpressiveCell()) {
       preResetLastTimbre(sensorSplit, sensorCell->note, sensorCell->channel);
     }
   }
@@ -1270,7 +1286,7 @@ void sendNewNote() {
   if (!isArpeggiatorEnabled(sensorSplit)) {
     // if we've switched from pitch X enabled to pitch X disabled and the last
     // pitch bend value was not neutral, reset it first to prevent skewed pitches
-    if (!Split[sensorSplit].sendX && hasPreviousPitchBendValue(sensorCell->channel)) {
+    if (!Split[sensorSplit].sendX && !isHarpejjiLayoutActive() && hasPreviousPitchBendValue(sensorCell->channel)) {
       preSendPitchBend(sensorSplit, 0, sensorCell->channel);
     }
 
@@ -1515,7 +1531,7 @@ short handleYExpression() {
   sensorCell->refreshY();
 
   short preferredTimbre = INVALID_DATA;
-  if (Split[sensorSplit].relativeY) {
+  if (Split[sensorSplit].relativeY && !isHarpejjiLayoutActive()) {
     preferredTimbre = constrain(Split[sensorSplit].initialRelativeY + (sensorCell->currentCalibratedY - sensorCell->initialY), 0, 127);
   }
   else {
