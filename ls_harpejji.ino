@@ -24,6 +24,23 @@ short getHarpejjiLayoutNoteNumber(byte split, byte col, byte row) {
                             Split[split].transposeLights);
 }
 
+short getHarpejjiNoteNumColumn(byte split, byte midiNote, byte row) {
+  short col = harpejjiNoteColumn(30,
+                                 row,
+                                 midiNote,
+                                 Split[split].transposeOctave,
+                                 Split[split].transposePitch,
+                                 Split[split].transposeLights,
+                                 NUMCOLS,
+                                 isLeftHandedSplit(split));
+  byte lowCol, highCol;
+  getSplitBoundaries(split, lowCol, highCol);
+  if (col < lowCol || col >= highCol) {
+    return -1;
+  }
+  return col;
+}
+
 void setCustomLayoutMode(HarpejjiLayoutMode mode) {
   Device.scalarLayoutEnabled = mode == HARPEJJI_LAYOUT_SCALAR_3X4;
   Device.harpejjiLayoutEnabled = mode == HARPEJJI_LAYOUT_HARPEJJI;

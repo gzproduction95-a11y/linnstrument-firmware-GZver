@@ -1822,6 +1822,10 @@ void resetPossibleNoteCells(byte split, byte notenum) {
 }
 
 short getNoteNumColumn(byte split, byte notenum, byte row) {
+  if (isHarpejjiLayoutActive()) {
+    return getHarpejjiNoteNumColumn(split, notenum, row);
+  }
+
   short row_offset_note = determineRowOffsetNote(split, row);
   short col = notenum - (row_offset_note + Split[split].transposeOctave) + 1           // calculate the column that this MIDI note can be played on
             + Split[split].transposeLights - Split[split].transposePitch;;             // adapt for transposition settings
