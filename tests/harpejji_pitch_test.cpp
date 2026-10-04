@@ -3,6 +3,16 @@
 #include <assert.h>
 
 int main() {
+  assert(harpejjiPerformanceLayoutActive(true, true, false));
+  assert(harpejjiPerformanceLayoutActive(true, false, true));
+  assert(!harpejjiPerformanceLayoutActive(true, false, false));
+  assert(!harpejjiPerformanceLayoutActive(false, true, true));
+
+  assert(harpejjiSwitchAffectsBothSplits(true, true, false));
+  assert(!harpejjiSwitchAffectsBothSplits(false, true, false));
+  assert(!harpejjiSwitchAffectsBothSplits(true, false, false));
+  assert(!harpejjiSwitchAffectsBothSplits(true, true, true));
+
   assert(harpejjiLayoutMode(false, false) == 0);
   assert(harpejjiLayoutMode(true, false) == 1);
   assert(harpejjiLayoutMode(true, true) == 2);

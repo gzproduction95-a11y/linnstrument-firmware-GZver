@@ -73,9 +73,27 @@ boolean isStatefulSwitchAssignment(byte assignment) {
          assignment == ASSIGNED_STANDALONE_MIDI_CLOCK;
 }
 
+boolean harpejjiSwitchBothSplitsAtPress[5] = { false, false, false, false, false };
+
+boolean isGlobalSingleSwitchAction(byte assignment) {
+  return assignment == ASSIGNED_ALTSPLIT || assignment == ASSIGNED_TAP_TEMPO ||
+         assignment == ASSIGNED_STANDALONE_MIDI_CLOCK;
+}
+
+boolean shouldSwitchAffectBothSplits(byte whichSwitch, byte assignment) {
+  return harpejjiSwitchAffectsBothSplits(Device.harpejjiLayoutEnabled,
+                                         whichSwitch == SWITCH_SWITCH_1 || whichSwitch == SWITCH_SWITCH_2,
+                                         isGlobalSingleSwitchAction(assignment));
+}
 void doSwitchPressed(byte whichSwitch) {
   byte assignment = Global.switchAssignment[whichSwitch];
-  if (!Global.splitActive || assignment == ASSIGNED_ALTSPLIT || !Global.switchBothSplits[whichSwitch]) {
+  boolean harpejjiBoth = shouldSwitchAffectBothSplits(whichSwitch, assignment);
+  harpejjiSwitchBothSplitsAtPress[whichSwitch] = harpejjiBoth;
+  if (harpejjiBoth) {
+    doSwitchPressedForSplit(whichSwitch, assignment, LEFT);
+    doSwitchPressedForSplit(whichSwitch, assignment, RIGHT);
+  }
+  else if (!Global.splitActive || assignment == ASSIGNED_ALTSPLIT || !Global.switchBothSplits[whichSwitch]) {
     doSwitchPressedForSplit(whichSwitch, assignment, Global.currentPerSplit);
   }
   else {
@@ -136,7 +154,12 @@ void doSwitchTriggeredForSplit(byte whichSwitch, byte assignment, byte split) {
 
 void doSwitchReleased(byte whichSwitch) {
   byte assignment = Global.switchAssignment[whichSwitch];
-  if (!Global.splitActive || assignment == ASSIGNED_ALTSPLIT || !Global.switchBothSplits[whichSwitch]) {
+  if (harpejjiSwitchBothSplitsAtPress[whichSwitch]) {
+    doSwitchReleasedForSplit(whichSwitch, assignment, LEFT);
+    doSwitchReleasedForSplit(whichSwitch, assignment, RIGHT);
+    harpejjiSwitchBothSplitsAtPress[whichSwitch] = false;
+  }
+  else if (!Global.splitActive || assignment == ASSIGNED_ALTSPLIT || !Global.switchBothSplits[whichSwitch]) {
     doSwitchReleasedForSplit(whichSwitch, assignment, Global.currentPerSplit);
   }
   else {
@@ -281,7 +304,7 @@ void performSwitchAssignmentOn(byte whichSwitch, byte assignment, byte split) {
       break;
 
     case ASSIGNED_ARPEGGIATOR:
-      performArpeggiatorToggle();
+      performArpeggiatorToggle(split);
       break;
 
     case ASSIGNED_TAP_TEMPO:
@@ -294,15 +317,15 @@ void performSwitchAssignmentOn(byte whichSwitch, byte assignment, byte split) {
       break;
 
     case ASSIGNED_PRESET_UP:
-      performPresetDelta(1);
+      performPresetDelta(1, split);
       break;
 
     case ASSIGNED_PRESET_DOWN:
-      performPresetDelta(-1);
+      performPresetDelta(-1, split);
       break;
 
     case ASSIGNED_REVERSE_PITCH_X:
-      performReverseSendXToggle();
+      performReverseSendXToggle(split);
       break;
 
     case ASSIGNED_SEQUENCER_PLAY:
@@ -335,29 +358,31 @@ void performSwitchAssignmentOn(byte whichSwitch, byte assignment, byte split) {
   }
 }
 
-void performPresetDelta(int delta) {
-  midiPreset[Global.currentPerSplit] = min(max(midiPreset[Global.currentPerSplit] + delta, 0), 127);
-  applyMidiPreset();
+void performPresetDelta(int delta, byte split) {
+  midiPreset[split] = min(max(midiPreset[split] + delta, 0), 127);
+  preSendPreset(split, midiPreset[split]);
   if (displayMode == displayPreset) {
     updateDisplay();
   }
 }
 
-void performArpeggiatorToggle() {
-  Split[Global.currentPerSplit].arpeggiator = !Split[Global.currentPerSplit].arpeggiator;
-  if (Split[Global.currentPerSplit].arpeggiator) {
-    temporarilyEnableArpeggiator();
+void performArpeggiatorToggle(byte split) {
+  Split[split].arpeggiator = !Split[split].arpeggiator;
+  if (Split[split].arpeggiator) {
+    arpTempoDelta[split] = 0;
+    midiSendNoteOffForAllTouches(split);
+    resetArpeggiatorState(split);
   }
   else {
-    disableTemporaryArpeggiator();
+    turnArpeggiatorOff(split);
   }
   if (displayMode == displayPerSplit) {
     updateDisplay();
   }
 }
 
-void performReverseSendXToggle() {
-  toggleEffectiveSendX(Global.currentPerSplit);
+void performReverseSendXToggle(byte split) {
+  toggleEffectiveSendX(split);
   if (displayMode == displayPerSplit) {
     updateDisplay();
   }
@@ -408,7 +433,7 @@ void performSwitchAssignmentOff(byte whichSwitch, byte assignment, byte split) {
       break;
 
     case ASSIGNED_ARPEGGIATOR:
-      performArpeggiatorToggle();
+      performArpeggiatorToggle(split);
       break;
 
     case ASSIGNED_LEGATO:
@@ -417,7 +442,7 @@ void performSwitchAssignmentOff(byte whichSwitch, byte assignment, byte split) {
       break;
 
     case ASSIGNED_REVERSE_PITCH_X:
-      performReverseSendXToggle();
+      performReverseSendXToggle(split);
       break;
 
     case ASSIGNED_STANDALONE_MIDI_CLOCK:

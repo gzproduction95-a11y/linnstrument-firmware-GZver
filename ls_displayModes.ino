@@ -575,7 +575,7 @@ void paintNormalDisplayCell(byte split, byte col, byte row) {
 
   short displayedNote;
   short actualnote;
-  if (isHarpejjiLayoutActive()) {
+  if (isHarpejjiPerformanceLayoutActive()) {
     displayedNote = getHarpejjiLayoutNoteNumber(split, col, row);
     actualnote = displayedNote;
   }

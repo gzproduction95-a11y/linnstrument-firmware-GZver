@@ -1,4 +1,4 @@
-# LinnStrument 2.3.4-x6 Hardware Test Checklist
+# linnstrument-firmware-GZver 2.3.4-x7 Hardware Test Checklist
 
 This checklist is for the unofficial LinnStrument 200 custom firmware release.
 The current candidate has been tested on LinnStrument 200. LinnStrument 128 has
@@ -6,7 +6,7 @@ not been fully verified.
 
 ## Version and installation
 
-1. Confirm the device reports `234-x6`.
+1. Confirm the device reports `234-x7`.
 2. Install the `.bin` with the official LinnStrument Updater.
 3. Keep a copy of the official firmware before testing.
 
@@ -34,3 +34,15 @@ not been fully verified.
 
 Record any missed trigger, unexpected MIDI event, stuck note, LED residue, or
 gesture that feels unsafe.
+
+## Harpejji Mode
+
+1. Enter Global Settings and touch column 20, bottom row.
+2. Confirm ON is steady white and OFF pulses blue with Tap Tempo.
+3. Orient the instrument with the function-button edge toward the player.
+4. Confirm pitch rises left-to-right and bottom-to-top.
+5. In One Channel mode, confirm vertical movement retriggers with Pitch/X temporarily off.
+6. Manually enable Pitch/X and confirm its normal horizontal behavior; exit Harpejji and confirm normal mode returns.
+7. Test Low Row at the row nearest the player.
+8. Verify Split-setting previews retain the Harpejji pitch layout.
+9. Verify Switch 1/2 split-target actions apply to both splits only while Harpejji is active; global single actions execute once.

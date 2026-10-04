@@ -24,6 +24,18 @@ inline HarpejjiLayoutMode harpejjiLayoutMode(bool scalarEnabled,
   if (scalarEnabled) return HARPEJJI_LAYOUT_SCALAR_3X4;
   return HARPEJJI_LAYOUT_NORMAL;
 }
+
+inline bool harpejjiPerformanceLayoutActive(bool harpejjiEnabled,
+                                            bool normalDisplay,
+                                            bool splitPointDisplay) {
+  return harpejjiEnabled && (normalDisplay || splitPointDisplay);
+}
+
+inline bool harpejjiSwitchAffectsBothSplits(bool harpejjiEnabled,
+                                            bool isSwitchButton,
+                                            bool globalSingleAction) {
+  return harpejjiEnabled && isSwitchButton && !globalSingleAction;
+}
 static const int16_t HARPEJJI_BEND_UNITS_PER_SEMITONE = 171;
 
 inline int16_t harpejjiNoteNumber(int16_t basePitch,

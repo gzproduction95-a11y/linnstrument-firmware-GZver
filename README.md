@@ -1,15 +1,15 @@
-# LinnStrument 2.3.4 Custom Firmware
+# linnstrument-firmware-GZver
 
 ## Overview
 
-This project is an unofficial community modification of Roger Linn Design's LinnStrument firmware 2.3.4. It adds an optional 3x4 Scalar Layout and extends the original Strum feature with Dynamic Strum while preserving the original LinnStrument controls and MIDI architecture wherever possible.
+This project is an unofficial community modification of Roger Linn Design's LinnStrument firmware 2.3.4. Release version: **2.3.4-x7**. It adds an optional 3x4 Scalar Layout, Dynamic Strum, and Harpejji Mode while preserving the original LinnStrument controls and MIDI architecture wherever possible.
 
 This firmware is intended for LinnStrument users interested in alternative pitch grids, voicing-based performance, expressive playing, and MPE. It is not an official Roger Linn Design firmware release.
 
 ## Base Firmware
 
 - Base: LinnStrument OS 2.3.4
-- Current custom version: **2.3.4-x6**
+- Current custom version: **2.3.4-x7**
 - Target board: Arduino Due (`arduino:sam:arduino_due_x`)
 - Tested hardware: LinnStrument 200
 - LinnStrument 128 compatibility has not been fully verified.
@@ -21,8 +21,23 @@ The upstream project is maintained by [Roger Linn Design](https://github.com/rog
 - Optional global 3x4 Scalar Layout for LinnStrument 200.
 - Scale-aware Scalar Swipe with per-touch MIDI/MPE state.
 - Per-split Dynamic Strum with voicing-aware eight-row mapping.
+- Harpejji Mode with a vertical playing orientation and Harpejji-style pitch geometry.
 - Dynamic Sustain, gesture Snapshot, Retrigger, and Legato integration.
 - Original LinnStrument performance, settings, sequencer, arpeggiator, and MIDI features retained when the custom modes are inactive.
+
+See [the English user guide](USER_GUIDE.md) or [中文用户指南](USER_GUIDE_zh-CN.md), plus the [installation guide](INSTALLATION.md) / [中文安装指南](INSTALLATION_zh-CN.md).
+
+## Documentation
+
+- Project overview: [English](README.md) / [简体中文](README_zh-CN.md)
+- User guide: [English](USER_GUIDE.md) / [简体中文](USER_GUIDE_zh-CN.md)
+- Installation: [English](INSTALLATION.md) / [简体中文](INSTALLATION_zh-CN.md)
+- Build instructions: [English](BUILDING.md) / [简体中文](BUILDING_zh-CN.md)
+- Hardware checks: [English](HARDWARE_TESTING.md) / [简体中文](HARDWARE_TESTING_zh-CN.md)
+- Release notes: [English](RELEASE_NOTES.md) / [简体中文](RELEASE_NOTES_zh-CN.md)
+- Changelog: [English](CHANGELOG.md) / [简体中文](CHANGELOG_zh-CN.md)
+- Scalar hardware checklist: [English](SCALAR_LAYOUT_TESTING.md) / [简体中文](SCALAR_LAYOUT_TESTING_zh-CN.md)
+- Release baseline: [English](BASELINE.md) / [简体中文](BASELINE_zh-CN.md)
 
 ## 3x4 Scalar Layout
 
@@ -86,16 +101,21 @@ Dynamic Sustain keeps notes alive while either the Voicing or Strum side still h
 
 ## Installation / Firmware Update
 
-1. Download `linnstrument-firmware-2.3.4-x6.bin` from the GitHub Release assets.
-2. Use the official LinnStrument Updater and follow its normal update procedure.
-3. Connect the LinnStrument when instructed and select the downloaded `.bin` file.
-4. After the update, verify that the device reports `234-x6`.
+Follow [INSTALLATION.md](INSTALLATION.md) or [安装指南（中文）](INSTALLATION_zh-CN.md). The release binary is named **linnstrument-firmware-GZver-2.3.4-x7.bin**.
 
 The official updater workflow is recommended because direct Arduino upload can reset LinnStrument settings, Projects, and calibration data. Keep a copy of the official firmware so the device can be restored if needed.
 
 ## Controls / Usage
 
 All ordinary LinnStrument controls remain in their original locations. Scalar Layout is a Global Settings option; Dynamic Strum is a per-split Strum option. Classic Strum retains its original behavior and lighting when selected.
+
+## Harpejji Mode
+
+Harpejji Mode is a global layout option for LinnStrument 200. In Global Settings, use the custom cell in **column 20, bottom row**, immediately to the right of the 3x4 Scalar Layout cell. When enabled, the cell is steady white; when disabled, it pulses blue in time with Tap Tempo. It is mutually exclusive with Scalar Layout.
+
+For the intended vertical playing orientation, place the function-button edge toward the player. Pitch rises left-to-right and bottom-to-top: columns advance by semitone and rows by two semitones. The Y axis provides expressive bend; the original Pitch/X controls remain available. In One Channel mode, entering Harpejji Mode temporarily disables Pitch/X so vertical movement retriggers notes; Pitch/X can be manually re-enabled in Per-Split Settings, and the temporary rule is restored when leaving the mode.
+
+The normal LinnStrument Main/Accent note-light configuration and Low Row behavior are retained. In Harpejji Mode, Switch 1 and Switch 2 actions that target a split are applied to both splits; global single actions such as Tap Tempo remain single actions. Outside Harpejji Mode, Switch behavior remains unchanged. See [USER_GUIDE.md](USER_GUIDE.md) for details.
 
 ## Compatibility
 
@@ -110,7 +130,7 @@ No major known functional issues were found in the current hardware-tested candi
 The reproducible project build targets Arduino Due and uses Arduino SAM Boards 1.6.11. The repository includes the build script and the DueFlashStorage library. With the project's local toolchain available, run:
 
 ```sh
-scripts/compile-firmware.sh release-2.3.4-x6
+scripts/compile-firmware.sh release-2.3.4-x7
 ```
 
 The script writes intermediates under `build/` and exports the compiled binary. Build caches and the offline toolchain are intentionally ignored by Git and are not required in the public repository.
@@ -120,6 +140,8 @@ The script writes intermediates under `build/` and exports the compiled binary. 
 Special thanks to Roger Linn and the entire LinnStrument / Roger Linn Design team for creating LinnStrument and making its firmware openly available for modification and experimentation.
 
 The 3x4 Scalar Layout concept in this firmware was inspired by Mike Gao's Polyplayground app and its approach to alternative pitch-grid relationships.
+
+Harpejji Mode is an independent layout adaptation for LinnStrument. It does not imply affiliation with or endorsement by any third party.
 
 The original LinnStrument source code and its copyright notices remain attributable to Roger Linn Design. Modifications in this fork are maintained by **GZ_Beatz**.
 

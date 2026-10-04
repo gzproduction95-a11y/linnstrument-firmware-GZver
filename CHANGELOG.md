@@ -1,5 +1,14 @@
 # Changelog
 
+## 2.3.4-x7
+
+Based on LinnStrument OS 2.3.4.
+
+- Added Harpejji Mode with corrected left-to-right and bottom-to-top pitch orientation.
+- Preserved Harpejji pitch mapping while previewing split settings.
+- Added Harpejji-only Switch 1/2 routing for split-targeted actions across both splits.
+- Updated the release documentation in English and Chinese.
+
 ## 2.3.4-x6
 
 Based on LinnStrument firmware 2.3.4.

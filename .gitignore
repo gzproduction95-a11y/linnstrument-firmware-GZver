@@ -12,6 +12,5 @@ stino.settings
 archives/
 release/*
 !release/
-!release/linnstrument-firmware-2.3.4-x6.bin
 
 .build-staging/

@@ -10,8 +10,15 @@ boolean isHarpejjiLayoutActive() {
   return Device.harpejjiLayoutEnabled && displayMode == displayNormal;
 }
 
+boolean isHarpejjiPerformanceLayoutActive() {
+  return harpejjiPerformanceLayoutActive(Device.harpejjiLayoutEnabled,
+                                         displayMode == displayNormal,
+                                         displayMode == displaySplitPoint);
+}
+
 boolean lowRowSpecialBehaviorActive(byte split) {
-  return !isHarpejjiLayoutActive() && Split[split].lowRowMode != lowRowNormal;
+  return !isHarpejjiPerformanceLayoutActive() &&
+         Split[split].lowRowMode != lowRowNormal;
 }
 
 boolean harpejjiOneChannelXEnabled[2] = { false, false };

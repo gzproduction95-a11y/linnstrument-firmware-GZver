@@ -31,7 +31,7 @@ assert "Split[sensorSplit].pitchResetOnRelease && isXExpressiveCell()" in TOUCH_
 assert "if (effectiveSendX(split) && !isLowRowBendActive(split))" in TOUCH_SOURCE
 
 assert "boolean lowRowSpecialBehaviorActive(byte split)" in HARPEJJI_SOURCE
-assert "!isHarpejjiLayoutActive() && Split[split].lowRowMode != lowRowNormal" in HARPEJJI_SOURCE
+assert "!isHarpejjiPerformanceLayoutActive()" in HARPEJJI_SOURCE
 assert "lowRowSpecialBehaviorActive(sensorSplit)" in LOWROW_SOURCE
 assert "lowRowSpecialBehaviorActive(split)" in DISPLAY_SOURCE
 assert "!lowRowSpecialBehaviorActive(split) || row != 0" in MIDI_SOURCE
@@ -39,3 +39,6 @@ assert "!lowRowSpecialBehaviorActive(split) || row != 0" in MIDI_SOURCE
 FIRMWARE_SOURCE = (ROOT / "linnstrument-firmware.ino").read_text()
 assert "#define SCALAR_LAYOUT_SETTINGS_COL 19" in FIRMWARE_SOURCE
 assert "#define SCALAR_LAYOUT_SETTINGS_ROW 0" in FIRMWARE_SOURCE
+
+assert "isHarpejjiPerformanceLayoutActive()" in DISPLAY_SOURCE
+assert "harpejjiSwitchAffectsBothSplits" in SWITCH_SOURCE
